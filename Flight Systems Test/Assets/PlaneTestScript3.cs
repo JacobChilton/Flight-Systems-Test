@@ -5,6 +5,7 @@ public class PlaneTest3 : MonoBehaviour
 {
     [Header("Flight Settings")]
     public float maxThrottleForce = 5000f;
+    public float currentThrottleForce;
     public float pitchSpeed = 50f;
     public float yawSpeed = 30f;
     public float rollSpeed = 80f;
@@ -34,12 +35,13 @@ public class PlaneTest3 : MonoBehaviour
         rb.useGravity = true;
         rb.linearDamping = 0.1f; // Unity 6 equivalent of drag
         rb.angularDamping = 0.5f;
+        currentThrottleForce = 0.0f;
     }
 
     void Update()
     {
         // Get user input
-        throttleInput = Mathf.Clamp(Input.GetAxis("Throttle"), 0f, 1f);
+        throttleInput = Mathf.Clamp(Input.GetAxis("Throttle"), -1f, 1f);
         pitchInput = Input.GetAxis("Vertical");
         yawInput = Input.GetAxis("Horizontal");
         rollInput = Input.GetAxis("Roll");
@@ -50,7 +52,7 @@ public class PlaneTest3 : MonoBehaviour
         // Update UI Speed Display
         UpdateSpeedUI();
 
-        Debug.Log($"Throttle: {throttleInput}, Roll: {rollInput}, Grounded: {isGrounded}");
+        //Debug.Log($"Throttle: {throttleInput}, Roll: {rollInput}, Grounded: {isGrounded}");
     }
 
     void FixedUpdate()
@@ -68,11 +70,24 @@ public class PlaneTest3 : MonoBehaviour
 
     void ApplyThrottle()
     {
-        if (throttleInput > 0f)
+        if (throttleInput > 0f) //keeps throttle output whole
         {
-            Vector3 thrustForce = transform.forward * throttleInput * maxThrottleForce * Time.deltaTime;
-            rb.AddForce(thrustForce, ForceMode.Force);
+
+                currentThrottleForce++;
+            
         }
+        else if (throttleInput < 0f)
+        { 
+                currentThrottleForce--;
+            
+        }
+
+        //currentThrottleForce += throttleInput;
+        currentThrottleForce = Mathf.Clamp(currentThrottleForce, 0, 100); // Prevent negative throttle
+
+
+        Vector3 thrustForce = transform.forward * ((currentThrottleForce/100) * maxThrottleForce) * Time.deltaTime;
+        rb.AddForce(thrustForce, ForceMode.Force);
     }
 
     void ApplyLift()
@@ -100,7 +115,7 @@ public class PlaneTest3 : MonoBehaviour
         if (speedText != null)
         {
             float airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
-            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle: {throttleInput}";
+            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle: {throttleInput}\ncurrentThrottle:{currentThrottleForce}";
         }
     }
 }
