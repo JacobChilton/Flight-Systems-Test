@@ -115,7 +115,7 @@ public class PlaneTest3 : MonoBehaviour
         if (speedText != null)
         {
             float airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
-            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle: {throttleInput}\ncurrentThrottle:{currentThrottleForce}";
+            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle: {throttleInput}\ncurrentThrottle:{currentThrottleForce}\nAltitude:{transform.position.y}";
         }
     }
 }
