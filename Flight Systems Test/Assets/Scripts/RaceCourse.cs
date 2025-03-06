@@ -46,5 +46,10 @@ public class RaceCourse : MonoBehaviour
         {
             CheckPoints[currentCheckpointIndex].SetActive(true);
         }
+        else
+        {
+            currentCheckpointIndex = 0;
+            CheckPoints[currentCheckpointIndex].SetActive(true);
+        }
     }
 }

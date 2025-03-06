@@ -6,7 +6,7 @@ public class checkPoint : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        raceCourse = Object.FindFirstObjectByType<RaceCourse>(); // Get reference to RaceCourse
+        raceCourse = GetComponentInParent<RaceCourse>();
     }
 
     // Update is called once per frame

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro; // Import TextMeshPro
 
 public class PlaneTest3 : MonoBehaviour
@@ -21,13 +22,15 @@ public class PlaneTest3 : MonoBehaviour
     private float rollInput;
     private bool isGrounded;
     private Rigidbody rb;
+    private PlayerControls controls;
+    private bool flapsDeployed = true;
 
     /*
      Controls:
      Throttle: W S
      Pitch: Q E
      Yaw: A D
-    */ 
+    */
 
     void Start() 
    {
@@ -36,6 +39,13 @@ public class PlaneTest3 : MonoBehaviour
         rb.linearDamping = 0.1f; // Unity 6 equivalent of drag
         rb.angularDamping = 0.5f;
         currentThrottleForce = 0.0f;
+    }
+
+    private void Awake()
+    {
+        controls = new PlayerControls();
+        controls.Flight.Flaps.performed += ctx => ToggleFlaps();
+        controls.Flight.Respawn.performed += ctx => Respawn();
     }
 
     void Update()
@@ -115,7 +125,37 @@ public class PlaneTest3 : MonoBehaviour
         if (speedText != null)
         {
             float airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
-            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle: {throttleInput}\ncurrentThrottle:{currentThrottleForce}\nAltitude:{transform.position.y}";
+            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle:{currentThrottleForce}\nAltitude:{transform.position.y}\nFlaps: {flapsDeployed}";
         }
+    }
+
+    void OnEnable() { controls.Enable(); }
+    void OnDisable() { controls.Disable(); }
+
+    void ToggleFlaps()
+    {
+        flapsDeployed = !flapsDeployed;
+        AdjustFlaps(flapsDeployed);
+    }
+    void AdjustFlaps(bool deployed)
+    {
+        Debug.Log("Flaps Adjusted");
+        if (deployed)
+        {
+            maxThrottleForce -= 500;  // Increase drag to simulate air resistance
+            //rb.AddForce(Vector3.up * 300f, ForceMode.Force); // Extra lift
+            liftForce += 30;
+        }
+        else
+        {
+            maxThrottleForce += 500;
+            liftForce -= 30;
+        }
+    }
+    void Respawn()
+    {
+        Debug.Log("Respawned");
+        transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z);
+        transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
     }
 }
