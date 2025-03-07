@@ -55,7 +55,7 @@ public class PlaneTest3 : MonoBehaviour
         pitchInput = Input.GetAxis("Vertical");
         yawInput = Input.GetAxis("Horizontal");
         rollInput = Input.GetAxis("Roll");
-
+         
         // Check if the plane is on the ground
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 2f); // Increased from 1f
 
