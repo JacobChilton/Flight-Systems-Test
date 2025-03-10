@@ -28,6 +28,7 @@ public class PlaneTest3 : MonoBehaviour
     [Header("GameObjects")]
     public GameObject flapsUp;
     public GameObject flapsDown;
+    public GameObject prop;
 
     /*
      Controls:
@@ -165,5 +166,9 @@ public class PlaneTest3 : MonoBehaviour
         Debug.Log("Respawned");
         transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z);
         transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+    }
+    void deadProp()
+    {
+        prop.SetActive(false);
     }
 }
