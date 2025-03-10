@@ -25,6 +25,10 @@ public class PlaneTest3 : MonoBehaviour
     private PlayerControls controls;
     private bool flapsDeployed = true;
 
+    [Header("GameObjects")]
+    public GameObject flapsUp;
+    public GameObject flapsDown;
+
     /*
      Controls:
      Throttle: W S
@@ -145,11 +149,15 @@ public class PlaneTest3 : MonoBehaviour
             maxThrottleForce -= 500;  // Increase drag to simulate air resistance
             //rb.AddForce(Vector3.up * 300f, ForceMode.Force); // Extra lift
             liftForce += 30;
+            flapsDown.SetActive(true);
+            flapsUp.SetActive(false);
         }
         else
         {
             maxThrottleForce += 500;
             liftForce -= 30;
+            flapsDown.SetActive(false);
+            flapsUp.SetActive(true);
         }
     }
     void Respawn()
