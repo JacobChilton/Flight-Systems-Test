@@ -108,6 +108,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LandingGear"",
+                    ""type"": ""Button"",
+                    ""id"": ""62130f44-0760-466b-9c49-8c3143299c51"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +141,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Respawn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""44ba509b-750c-47f6-9520-097173aa334f"",
+                    ""path"": ""<Keyboard>/#(G)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LandingGear"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -142,6 +162,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Flight = asset.FindActionMap("Flight", throwIfNotFound: true);
         m_Flight_Flaps = m_Flight.FindAction("Flaps", throwIfNotFound: true);
         m_Flight_Respawn = m_Flight.FindAction("Respawn", throwIfNotFound: true);
+        m_Flight_LandingGear = m_Flight.FindAction("LandingGear", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -224,6 +245,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private List<IFlightActions> m_FlightActionsCallbackInterfaces = new List<IFlightActions>();
     private readonly InputAction m_Flight_Flaps;
     private readonly InputAction m_Flight_Respawn;
+    private readonly InputAction m_Flight_LandingGear;
     /// <summary>
     /// Provides access to input actions defined in input action map "Flight".
     /// </summary>
@@ -243,6 +265,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Flight/Respawn".
         /// </summary>
         public InputAction @Respawn => m_Wrapper.m_Flight_Respawn;
+        /// <summary>
+        /// Provides access to the underlying input action "Flight/LandingGear".
+        /// </summary>
+        public InputAction @LandingGear => m_Wrapper.m_Flight_LandingGear;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -275,6 +301,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Respawn.started += instance.OnRespawn;
             @Respawn.performed += instance.OnRespawn;
             @Respawn.canceled += instance.OnRespawn;
+            @LandingGear.started += instance.OnLandingGear;
+            @LandingGear.performed += instance.OnLandingGear;
+            @LandingGear.canceled += instance.OnLandingGear;
         }
 
         /// <summary>
@@ -292,6 +321,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Respawn.started -= instance.OnRespawn;
             @Respawn.performed -= instance.OnRespawn;
             @Respawn.canceled -= instance.OnRespawn;
+            @LandingGear.started -= instance.OnLandingGear;
+            @LandingGear.performed -= instance.OnLandingGear;
+            @LandingGear.canceled -= instance.OnLandingGear;
         }
 
         /// <summary>
@@ -346,5 +378,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRespawn(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LandingGear" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLandingGear(InputAction.CallbackContext context);
     }
 }

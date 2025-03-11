@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - CheckPoints
+  - Terrain
   layers:
   - Default
   - TransparentFX

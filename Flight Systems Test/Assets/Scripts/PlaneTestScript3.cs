@@ -12,6 +12,8 @@ public class PlaneTest3 : MonoBehaviour
     public float rollSpeed = 80f;
     public float liftForce = 500f; // Increased for stronger effect
     public float airResistance = 0.99f;
+    public bool propDead = false;
+    public bool gearUp = true;
 
     [Header("UI Elements")]
     public TextMeshProUGUI speedText; // Assign TMP text in the inspector
@@ -28,7 +30,7 @@ public class PlaneTest3 : MonoBehaviour
     [Header("GameObjects")]
     public GameObject flapsUp;
     public GameObject flapsDown;
-    public GameObject prop;
+    public GameObject prop, LandGear;
 
     /*
      Controls:
@@ -44,6 +46,7 @@ public class PlaneTest3 : MonoBehaviour
         rb.linearDamping = 0.1f; // Unity 6 equivalent of drag
         rb.angularDamping = 0.5f;
         currentThrottleForce = 0.0f;
+        LandingGear();
     }
 
     private void Awake()
@@ -51,6 +54,7 @@ public class PlaneTest3 : MonoBehaviour
         controls = new PlayerControls();
         controls.Flight.Flaps.performed += ctx => ToggleFlaps();
         controls.Flight.Respawn.performed += ctx => Respawn();
+        controls.Flight.LandingGear.performed += ctx => LandingGear();
     }
 
     void Update()
@@ -85,19 +89,22 @@ public class PlaneTest3 : MonoBehaviour
 
     void ApplyThrottle()
     {
-        if (throttleInput > 0f) //keeps throttle output whole
+        if (!propDead)
         {
+            //if (throttleInput > 0f) //keeps throttle output whole
+            //{
+            //    currentThrottleForce++;
 
-                currentThrottleForce++;
-            
-        }
-        else if (throttleInput < 0f)
-        { 
-                currentThrottleForce--;
-            
+            //}
+            //else if (throttleInput < 0f)
+            //{
+            //    currentThrottleForce--;
+
+            //}
+            currentThrottleForce += throttleInput;
         }
 
-        //currentThrottleForce += throttleInput;
+        
         currentThrottleForce = Mathf.Clamp(currentThrottleForce, 0, 100); // Prevent negative throttle
 
 
@@ -147,7 +154,10 @@ public class PlaneTest3 : MonoBehaviour
         Debug.Log("Flaps Adjusted");
         if (deployed)
         {
-            maxThrottleForce -= 500;  // Increase drag to simulate air resistance
+            if (propDead == false)
+            {
+                maxThrottleForce -= 500;  // Increase drag to simulate air resistance
+            }
             //rb.AddForce(Vector3.up * 300f, ForceMode.Force); // Extra lift
             liftForce += 30;
             flapsDown.SetActive(true);
@@ -155,7 +165,10 @@ public class PlaneTest3 : MonoBehaviour
         }
         else
         {
-            maxThrottleForce += 500;
+            if (propDead == false)
+            {
+                maxThrottleForce += 500;
+            }
             liftForce -= 30;
             flapsDown.SetActive(false);
             flapsUp.SetActive(true);
@@ -166,9 +179,33 @@ public class PlaneTest3 : MonoBehaviour
         Debug.Log("Respawned");
         transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z);
         transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+//        maxThrottleForce = 3000;
+        prop.SetActive(true);
+        Debug.Log("prop back - respawned");
+        propDead = false;
     }
-    void deadProp()
+    public void deadProp()
     {
+        maxThrottleForce = 0;
         prop.SetActive(false);
+        Debug.Log("prop gone");
+        propDead = true;
+        currentThrottleForce = 0;
+    }
+
+    void LandingGear()
+    {
+        if (gearUp)
+        {
+            LandGear.SetActive(true);
+            gearUp = false;
+            maxThrottleForce -= 100;
+        }
+        else 
+        { 
+            LandGear.SetActive(false);
+            gearUp = true;
+            maxThrottleForce += 100;
+        }
     }
 }

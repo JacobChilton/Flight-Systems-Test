@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class propScript : MonoBehaviour
 {
+    public PlaneTest3 planeTest3;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -13,8 +14,13 @@ public class propScript : MonoBehaviour
     {
         
     }
-    private void OnCollisionEnter(Collision collision)
-    {
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.GetComponent<Terrain>())
+        {
+            Debug.Log("collision");
+            planeTest3.deadProp();
+        }
     }
 }
