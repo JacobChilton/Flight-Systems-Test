@@ -154,7 +154,7 @@ public class PlaneTest3 : MonoBehaviour
         Debug.Log("Flaps Adjusted");
         if (deployed)
         {
-            if (propDead == false)
+            if (!propDead)
             {
                 maxThrottleForce -= 500;  // Increase drag to simulate air resistance
             }
@@ -165,7 +165,7 @@ public class PlaneTest3 : MonoBehaviour
         }
         else
         {
-            if (propDead == false)
+            if (!propDead)
             {
                 maxThrottleForce += 500;
             }
@@ -179,10 +179,19 @@ public class PlaneTest3 : MonoBehaviour
         Debug.Log("Respawned");
         transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z);
         transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
-//        maxThrottleForce = 3000;
+        //maxThrottleForce = 3000;
         prop.SetActive(true);
         Debug.Log("prop back - respawned");
         propDead = false;
+        maxThrottleForce = 3500;
+        if (flapsDown)
+        {
+            maxThrottleForce -= 500;
+        }
+        if (!gearUp)
+        {
+            maxThrottleForce -= 100;
+        }
     }
     public void deadProp()
     {
@@ -190,7 +199,7 @@ public class PlaneTest3 : MonoBehaviour
         prop.SetActive(false);
         Debug.Log("prop gone");
         propDead = true;
-        currentThrottleForce = 0;
+        currentThrottleForce -= 2500;
     }
 
     void LandingGear()
@@ -199,13 +208,19 @@ public class PlaneTest3 : MonoBehaviour
         {
             LandGear.SetActive(true);
             gearUp = false;
-            maxThrottleForce -= 100;
+            if (!propDead)
+            {
+                maxThrottleForce -= 100;
+            }
         }
         else 
         { 
             LandGear.SetActive(false);
             gearUp = true;
-            maxThrottleForce += 100;
+            if (!propDead)
+            {
+                maxThrottleForce += 100;
+            }
         }
     }
 }
