@@ -36,7 +36,7 @@ public class PlaneTest3 : MonoBehaviour
      Controls:
      Throttle: W S
      Pitch: Q E
-     Yaw: A D
+     Roll: A D
     */
 
     void Start() 
@@ -89,24 +89,12 @@ public class PlaneTest3 : MonoBehaviour
 
     void ApplyThrottle()
     {
-        if (!propDead)
+        if (!propDead) //adjusts throttle if the propeller is not dead
         {
-            //if (throttleInput > 0f) //keeps throttle output whole
-            //{
-            //    currentThrottleForce++;
-
-            //}
-            //else if (throttleInput < 0f)
-            //{
-            //    currentThrottleForce--;
-
-            //}
             currentThrottleForce += throttleInput;
         }
-
-        
+     
         currentThrottleForce = Mathf.Clamp(currentThrottleForce, 0, 100); // Prevent negative throttle
-
 
         Vector3 thrustForce = transform.forward * ((currentThrottleForce/100) * maxThrottleForce) * Time.deltaTime;
         rb.AddForce(thrustForce, ForceMode.Force);
@@ -125,7 +113,7 @@ public class PlaneTest3 : MonoBehaviour
         }
     }
 
-    void ApplyFlightControls()
+    void ApplyFlightControls() //assigns flight controls
     {
         rb.AddTorque(transform.right * pitchInput * pitchSpeed * Time.deltaTime, ForceMode.Force);
         rb.AddTorque(transform.up * yawInput * yawSpeed * Time.deltaTime, ForceMode.Force);
@@ -137,14 +125,14 @@ public class PlaneTest3 : MonoBehaviour
         if (speedText != null)
         {
             float airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
-            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle:{currentThrottleForce}\nAltitude:{transform.position.y}\nFlaps: {flapsDeployed}";
+            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle:{Mathf.Ceil(currentThrottleForce)/*Rounds to whole number*/}\nAltitude:{(Mathf.Round(transform.position.y * 100)) / 100.0/*Rounds to 2 DP*/}\nFlaps: {flapsDeployed}";
         }
     }
 
-    void OnEnable() { controls.Enable(); }
+    void OnEnable() { controls.Enable(); } //checks which input is pressed and directs to function
     void OnDisable() { controls.Disable(); }
 
-    void ToggleFlaps()
+    void ToggleFlaps() //sends which way to toggle flaps
     {
         flapsDeployed = !flapsDeployed;
         AdjustFlaps(flapsDeployed);
@@ -152,14 +140,14 @@ public class PlaneTest3 : MonoBehaviour
     void AdjustFlaps(bool deployed)
     {
         Debug.Log("Flaps Adjusted");
-        if (deployed)
+        if (deployed) //decides which way to toggle flaps based on bool sent by input
         {
-            if (!propDead)
+            if (!propDead) //only if prop is alive, causes issues with throttle amounts when it is supposed to be on 0 if dead.
             {
                 maxThrottleForce -= 500;  // Increase drag to simulate air resistance
             }
             //rb.AddForce(Vector3.up * 300f, ForceMode.Force); // Extra lift
-            liftForce += 30;
+            liftForce += 30; //increases lift if flaps are deplyed
             flapsDown.SetActive(true);
             flapsUp.SetActive(false);
         }
@@ -169,7 +157,7 @@ public class PlaneTest3 : MonoBehaviour
             {
                 maxThrottleForce += 500;
             }
-            liftForce -= 30;
+            liftForce -= 30; //decreases lift if flaps are raised
             flapsDown.SetActive(false);
             flapsUp.SetActive(true);
         }
@@ -177,14 +165,13 @@ public class PlaneTest3 : MonoBehaviour
     void Respawn()
     {
         Debug.Log("Respawned");
-        transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z);
-        transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
-        //maxThrottleForce = 3000;
-        prop.SetActive(true);
+        transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z); //raises plane by 20 on the Y axis
+        transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0); //redjusts plane angle
+        prop.SetActive(true); //respawns propeller
         Debug.Log("prop back - respawned");
         propDead = false;
-        maxThrottleForce = 3500;
-        if (flapsDown)
+        maxThrottleForce = 3500; //resets throttle
+        if (flapsDeployed) //adjusts throttle based on flaps and landing gear
         {
             maxThrottleForce -= 500;
         }
@@ -193,18 +180,18 @@ public class PlaneTest3 : MonoBehaviour
             maxThrottleForce -= 100;
         }
     }
-    public void deadProp()
+    public void deadProp() //destroys propeller and resets throttle to 0
     {
         maxThrottleForce = 0;
         prop.SetActive(false);
         Debug.Log("prop gone");
         propDead = true;
-        currentThrottleForce -= 2500;
+        currentThrottleForce = 0;
     }
 
     void LandingGear()
     {
-        if (gearUp)
+        if (gearUp) //toggles landing gear and adjusts top speed to simulate match drag
         {
             LandGear.SetActive(true);
             gearUp = false;

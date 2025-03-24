@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class RaceCourse : MonoBehaviour
 {
+    public GameManager gameManager;
     public GameObject[] CheckPoints;
     [SerializeField]private int currentCheckpointIndex = 0;
 
     void Start()
     {
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         List<GameObject> checkpointsList = new List<GameObject>();
 
         // Find all child objects with the "CheckPoints" tag
@@ -45,11 +47,18 @@ public class RaceCourse : MonoBehaviour
         if (currentCheckpointIndex < CheckPoints.Length)
         {
             CheckPoints[currentCheckpointIndex].SetActive(true);
+            CheckPoints[currentCheckpointIndex + 1].SetActive(true);
         }
         else
         {
+            Debug.Log("Race Finished");
             currentCheckpointIndex = 0;
             CheckPoints[currentCheckpointIndex].SetActive(true);
+            CheckPoints[currentCheckpointIndex + 1].SetActive(true);
+        }
+        if (currentCheckpointIndex == 1)
+        {
+            gameManager.disableOtherRaces(gameObject);
         }
     }
 }

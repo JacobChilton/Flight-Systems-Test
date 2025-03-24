@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CheckPoints
   - Terrain
+  - RaceCourse
   layers:
   - Default
   - TransparentFX

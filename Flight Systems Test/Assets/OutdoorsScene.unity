@@ -252,8 +252,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -552.7, y: 389.5}
-  m_SizeDelta: {x: 429.1, y: 50}
+  m_AnchoredPosition: {x: -523.2, y: 389.5}
+  m_SizeDelta: {x: 476.1, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &18431311
 GameObject:
@@ -1757,7 +1757,7 @@ GameObject:
   - component: {fileID: 431187701}
   m_Layer: 0
   m_Name: RaceCourse
-  m_TagString: Untagged
+  m_TagString: RaceCourse
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1774,6 +1774,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1b12aedac7ec264aafe495536cd2865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
   CheckPoints: []
   currentCheckpointIndex: 0
 --- !u!4 &431187702
@@ -4588,6 +4589,51 @@ Terrain:
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0
   m_TreeMotionVectorModeOverride: 3
+--- !u!1 &1275213497
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1275213499}
+  - component: {fileID: 1275213498}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1275213498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275213497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60a02e3d3e2c9fa4b8b53e9cab84f466, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  raceCourses: []
+--- !u!4 &1275213499
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275213497}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -520.8259, y: 0.4967416, z: 1678.1841}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1300086190
 GameObject:
   m_ObjectHideFlags: 0
@@ -5278,7 +5324,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0.8594064, z: 0, w: 0.5112931}
   m_LocalPosition: {x: -807.75, y: 2.6, z: 1833.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 217128270}
   - {fileID: 529087606}
@@ -5781,7 +5827,7 @@ GameObject:
   - component: {fileID: 1772423584}
   - component: {fileID: 1772423583}
   m_Layer: 0
-  m_Name: Plane (1)
+  m_Name: Runway
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5872,7 +5918,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.24276856, z: 0, w: 0.97008425}
   m_LocalPosition: {x: -499.164, y: 0.01, z: 1670.656}
-  m_LocalScale: {x: 71.08, y: 0.2, z: 3.4}
+  m_LocalScale: {x: 71.08, y: 0.1, z: 1.28}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -6340,7 +6386,7 @@ GameObject:
   - component: {fileID: 2026739462}
   m_Layer: 0
   m_Name: RaceCourse (1)
-  m_TagString: Untagged
+  m_TagString: RaceCourse
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6357,6 +6403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1b12aedac7ec264aafe495536cd2865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
   CheckPoints: []
   currentCheckpointIndex: 0
 --- !u!4 &2026739463
@@ -7174,3 +7221,4 @@ SceneRoots:
   - {fileID: 1800138296450026926}
   - {fileID: 1645313110}
   - {fileID: 1772423586}
+  - {fileID: 1275213499}
