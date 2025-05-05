@@ -76,12 +76,6 @@ public class PlaneTest3 : MonoBehaviour
 
     void FixedUpdate()
     {
-        //if (isGrounded)
-        //{
-        //    rb.linearVelocity = Vector3.zero; // FIXED: Using linearVelocity for Unity 6
-        //    return;
-        //}
-
         ApplyThrottle();
         ApplyLift();
         ApplyFlightControls();

@@ -37,36 +37,21 @@ public class PlaneTest2 : MonoBehaviour
 
     void Update()
     {
-        // Capture throttle and roll inputs
-        //throttleInput = Input.GetKey(KeyCode.W) ? 1 : Input.GetKey(KeyCode.S) ? -1 : 0;
-        throttleInput = Mathf.Clamp(Input.GetAxis("Throttle"), -1f, 1f);
+        
+        throttleInput = Mathf.Clamp(Input.GetAxis("Throttle"), -1f, 1f); //Capture throttle and roll inputs
         rollInput = (Input.GetKey(KeyCode.D) ? -1 : 0) + (Input.GetKey(KeyCode.A) ? 1 : 0);
-
-        // Get mouse position and calculate offset from screen center
-        mousePosition = Input.mousePosition;
+       
+        mousePosition = Input.mousePosition; //Get mouse position and calculate offset from screen center
         mouseOffset = (mousePosition - screenCenter) / screenCenter;
-
-        // Calculate airspeed from Rigidbody velocity magnitude
-        airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
+        
+        airspeed = rb.linearVelocity.magnitude * 3.6f; //Calculate speed from Rigidbody velocity magnitude and convert from m/s to km/h
         if (airspeedText) airspeedText.text = "Speed: " + Mathf.Round(airspeed) + " km/h";
     }
 
     void FixedUpdate()
     {
-        ApplyThrottle();
+        ApplyThrottle(); //Applies throttle force every frame
 
-    
-        // Apply forward force for throttle
-        //float currentSpeed = rb.linearVelocity.magnitude;
-        //if ((currentSpeed < maxSpeed && throttleInput > 0) || (currentSpeed > minSpeed && throttleInput < 0))
-        //{
-        //    rb.AddForce(transform.forward * throttleInput * throttlePower, ForceMode.Acceleration);
-        //}
-
-        //// Apply aerodynamic lift to keep the plane in the air
-        //rb.AddForce(Vector3.up * lift * Mathf.Clamp(currentSpeed / maxSpeed, 0, 1), ForceMode.Force);
-
-        // Apply rotation forces based on mouse movement
         float pitch = -mouseOffset.y * pitchSpeed;
         float yaw = mouseOffset.x * yawSpeed;
         float roll = rollInput * rollSpeed;
@@ -78,11 +63,23 @@ public class PlaneTest2 : MonoBehaviour
     void ApplyThrottle()
     {
         currentThrottleForce += throttleInput;
-
-
         currentThrottleForce = Mathf.Clamp(currentThrottleForce, 0, 100); // Prevent negative throttle
 
         Vector3 thrustForce = transform.forward * ((currentThrottleForce / 100) * maxThrottleForce) * Time.deltaTime;
         rb.AddForce(thrustForce, ForceMode.Force);
     }
 }
+
+
+
+// Apply forward force for throttle
+//float currentSpeed = rb.linearVelocity.magnitude;
+//if ((currentSpeed < maxSpeed && throttleInput > 0) || (currentSpeed > minSpeed && throttleInput < 0))
+//{
+//    rb.AddForce(transform.forward * throttleInput * throttlePower, ForceMode.Acceleration);
+//}
+
+//// Apply aerodynamic lift to keep the plane in the air
+//rb.AddForce(Vector3.up * lift * Mathf.Clamp(currentSpeed / maxSpeed, 0, 1), ForceMode.Force);
+
+// Apply rotation forces based on mouse movement

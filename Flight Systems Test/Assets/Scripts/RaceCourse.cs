@@ -12,8 +12,7 @@ public class RaceCourse : MonoBehaviour
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         List<GameObject> checkpointsList = new List<GameObject>();
 
-        // Find all child objects with the "CheckPoints" tag
-        foreach (Transform child in transform)
+        foreach (Transform child in transform) //Find all child objects with the "CheckPoints" tag
         {
             if (child.CompareTag("CheckPoints"))
             {
@@ -21,30 +20,23 @@ public class RaceCourse : MonoBehaviour
             }
         }
 
-        // Convert list to array
-        CheckPoints = checkpointsList.ToArray();
+        CheckPoints = checkpointsList.ToArray(); //Converts list to array
 
-        // Disable all checkpoints except the first one
-        for (int i = 0; i < CheckPoints.Length; i++)
+        for (int i = 0; i < CheckPoints.Length; i++) //Disable all checkpoints except the first one
         {
             CheckPoints[i].SetActive(i == 0);
         }
     }
 
-    // Function to be called by checkpoint scripts when a player reaches a checkpoint
+    // Function called by checkpoint scripts when a player reaches a checkpoint
     public void OnCheckpointReached(GameObject checkpoint)
-    {
-        // Check if the checkpoint is the correct one in sequence
-        if (CheckPoints.Length == 0 || checkpoint != CheckPoints[currentCheckpointIndex]) return;
+    { 
+        if (CheckPoints.Length == 0 || checkpoint != CheckPoints[currentCheckpointIndex]) return; //Check if the checkpoint is the correct one in sequence(ensures no skipping)
 
-        // Disable the current checkpoint
-        CheckPoints[currentCheckpointIndex].SetActive(false);
+        CheckPoints[currentCheckpointIndex].SetActive(false); //Disable the current checkpoint and move to next
+        currentCheckpointIndex++; 
 
-        // Move to the next checkpoint
-        currentCheckpointIndex++;
-
-        // Enable the next checkpoint if it exists
-        if (currentCheckpointIndex < CheckPoints.Length)
+        if (currentCheckpointIndex < CheckPoints.Length)//Enable the next checkpoint if it exists
         {
             CheckPoints[currentCheckpointIndex].SetActive(true);
             CheckPoints[currentCheckpointIndex + 1].SetActive(true);
@@ -56,7 +48,7 @@ public class RaceCourse : MonoBehaviour
             CheckPoints[currentCheckpointIndex].SetActive(true);
             CheckPoints[currentCheckpointIndex + 1].SetActive(true);
         }
-        if (currentCheckpointIndex == 1)
+        if (currentCheckpointIndex == 1) //Disables the other courses if one is started
         {
             gameManager.disableOtherRaces(gameObject);
         }
