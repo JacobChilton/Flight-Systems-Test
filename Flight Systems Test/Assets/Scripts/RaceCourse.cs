@@ -39,14 +39,17 @@ public class RaceCourse : MonoBehaviour
         if (currentCheckpointIndex < CheckPoints.Length)//Enable the next checkpoint if it exists
         {
             CheckPoints[currentCheckpointIndex].SetActive(true);
-            CheckPoints[currentCheckpointIndex + 1].SetActive(true);
+            if (currentCheckpointIndex < CheckPoints.Length - 1)
+            {
+                CheckPoints[currentCheckpointIndex + 1].SetActive(true);
+            }
         }
         else
         {
             Debug.Log("Race Finished");
             currentCheckpointIndex = 0;
             CheckPoints[currentCheckpointIndex].SetActive(true);
-            CheckPoints[currentCheckpointIndex + 1].SetActive(true);
+            gameManager.enableOtherRaces(gameObject);
         }
         if (currentCheckpointIndex == 1) //Disables the other courses if one is started
         {
