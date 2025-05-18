@@ -12,11 +12,11 @@ public class DayNightCycle : MonoBehaviour
     private bool isTransitioning = false;
     public Light moonLight, sunLight;
 
-    [Range(0, 1000)] public float sunTransitionSpeed = 1f;
+    [Range(0, 10000)] public float sunTransitionSpeed = 1f;
     [Range(0, 1000)] public float moonTransitionSpeed = 0.2f;
 
-    private float sunTargetIntensity = 100f;
-    private float moonTargetIntensity = 8f;
+    private float sunTargetIntensity = 100000f;
+    private float moonTargetIntensity = 80f;
 
     void Start()
     {
@@ -40,9 +40,10 @@ public class DayNightCycle : MonoBehaviour
             currentDayLength = baseDayLengthInSeconds / 2f;
             //moonLight.enabled = true;
             //sunLight.enabled = false;
-            sunTargetIntensity = 10f;
-            moonTargetIntensity = 8f;
+            sunTargetIntensity = 800f;
+            moonTargetIntensity = 80f;
             isTransitioning = true;
+            moonLight.enabled = true;
         }
         else if(angle < 180f && !isDay)
         {
@@ -50,10 +51,14 @@ public class DayNightCycle : MonoBehaviour
             isDay = true;
             currentDayLength = baseDayLengthInSeconds;
             //sunLight.enabled = true;
-            sunTargetIntensity = 100;
+            sunTargetIntensity = 100000;
             moonTargetIntensity = 0f;
             isTransitioning = true;
-            
+        }
+        else if(angle > -10f  && isDay)
+        {
+            Debug.Log("sun On");
+            sunLight.enabled = true;
         }
 
         if (isTransitioning)
@@ -69,6 +74,14 @@ public class DayNightCycle : MonoBehaviour
         if (Mathf.Approximately(sunLight.intensity, sunLightVal) && Mathf.Approximately(moonLight.intensity, moonLightVal))
         {
             isTransitioning = false;
+            if (isDay)
+            {
+                moonLight.enabled = false;
+            }
+            else
+            {
+                sunLight.enabled = false;
+            }
         }
         
     }
