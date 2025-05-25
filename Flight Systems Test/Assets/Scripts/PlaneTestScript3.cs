@@ -26,12 +26,14 @@ public class PlaneTest3 : MonoBehaviour
     private Rigidbody rb;
     private PlayerControls controls;
     private bool flapsDeployed = true;
+    public float airspeed;
 
     [Header("GameObjects")]
     public GameObject flapsUp;
     public GameObject flapsDown;
     public GameObject prop, LandGear;
-
+    [SerializeField] private Camera followCam;
+    [SerializeField] private Camera orbitCam;
     /*
      Controls:
      Throttle: W S
@@ -55,6 +57,8 @@ public class PlaneTest3 : MonoBehaviour
         controls.Flight.Flaps.performed += ctx => ToggleFlaps();
         controls.Flight.Respawn.performed += ctx => Respawn();
         controls.Flight.LandingGear.performed += ctx => LandingGear();
+        controls.Flight.FreeLookToggle.performed += ctx => ToggleFreeLook(true);
+        controls.Flight.FreeLookToggle.canceled += ctx => ToggleFreeLook(false);
     }
 
     void Update()
@@ -118,7 +122,7 @@ public class PlaneTest3 : MonoBehaviour
     {
         if (speedText != null)
         {
-            float airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
+            airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
             speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle:{Mathf.Ceil(currentThrottleForce)/*Rounds to whole number*/}\nAltitude:{(Mathf.Round(transform.position.y * 100)) / 100.0/*Rounds to 2 DP*/}\nFlaps: {flapsDeployed}";
         }
     }
@@ -203,5 +207,10 @@ public class PlaneTest3 : MonoBehaviour
                 maxThrottleForce += 100;
             }
         }
+    }
+    private void ToggleFreeLook(bool enable)
+    {
+        followCam.enabled = !enable;
+        orbitCam.enabled = enable;
     }
 }

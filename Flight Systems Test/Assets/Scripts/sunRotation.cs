@@ -15,8 +15,8 @@ public class DayNightCycle : MonoBehaviour
     [Range(0, 10000)] public float sunTransitionSpeed = 1f;
     [Range(0, 1000)] public float moonTransitionSpeed = 0.2f;
 
-    private float sunTargetIntensity = 100000f;
-    private float moonTargetIntensity = 80f;
+    private float sunTargetIntensity = 10000f;
+    private float moonTargetIntensity = 4f;
 
     void Start()
     {
@@ -40,10 +40,11 @@ public class DayNightCycle : MonoBehaviour
             currentDayLength = baseDayLengthInSeconds / 2f;
             //moonLight.enabled = true;
             //sunLight.enabled = false;
-            sunTargetIntensity = 800f;
-            moonTargetIntensity = 80f;
+            sunTargetIntensity = 100f;
+            moonTargetIntensity = 4f;
             isTransitioning = true;
             moonLight.enabled = true;
+            moonTransitionSpeed = 0.2f;
         }
         else if(angle < 180f && !isDay)
         {
@@ -51,9 +52,10 @@ public class DayNightCycle : MonoBehaviour
             isDay = true;
             currentDayLength = baseDayLengthInSeconds;
             //sunLight.enabled = true;
-            sunTargetIntensity = 100000;
-            moonTargetIntensity = 0f;
+            sunTargetIntensity = 10000;
+            moonTargetIntensity = 1f;
             isTransitioning = true;
+            moonTransitionSpeed = 10f;
         }
         else if(angle > -10f  && isDay)
         {

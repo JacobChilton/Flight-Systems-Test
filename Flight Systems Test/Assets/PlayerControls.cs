@@ -117,6 +117,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FreeLookToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""1f1987ec-3324-49c1-b662-984f38ab5f52"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Zoom"",
+                    ""type"": ""Value"",
+                    ""id"": ""b6413bb2-0094-485e-ab0a-0259a8f4a4b0"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -152,6 +170,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""LandingGear"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""deefbe94-dcd7-4754-96b8-c6b22dd80cc5"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FreeLookToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""df11782c-dc25-4af8-ae2f-71ffdf7d63e1"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Zoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -163,6 +203,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Flight_Flaps = m_Flight.FindAction("Flaps", throwIfNotFound: true);
         m_Flight_Respawn = m_Flight.FindAction("Respawn", throwIfNotFound: true);
         m_Flight_LandingGear = m_Flight.FindAction("LandingGear", throwIfNotFound: true);
+        m_Flight_FreeLookToggle = m_Flight.FindAction("FreeLookToggle", throwIfNotFound: true);
+        m_Flight_Zoom = m_Flight.FindAction("Zoom", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -246,6 +288,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Flight_Flaps;
     private readonly InputAction m_Flight_Respawn;
     private readonly InputAction m_Flight_LandingGear;
+    private readonly InputAction m_Flight_FreeLookToggle;
+    private readonly InputAction m_Flight_Zoom;
     /// <summary>
     /// Provides access to input actions defined in input action map "Flight".
     /// </summary>
@@ -269,6 +313,14 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Flight/LandingGear".
         /// </summary>
         public InputAction @LandingGear => m_Wrapper.m_Flight_LandingGear;
+        /// <summary>
+        /// Provides access to the underlying input action "Flight/FreeLookToggle".
+        /// </summary>
+        public InputAction @FreeLookToggle => m_Wrapper.m_Flight_FreeLookToggle;
+        /// <summary>
+        /// Provides access to the underlying input action "Flight/Zoom".
+        /// </summary>
+        public InputAction @Zoom => m_Wrapper.m_Flight_Zoom;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -304,6 +356,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @LandingGear.started += instance.OnLandingGear;
             @LandingGear.performed += instance.OnLandingGear;
             @LandingGear.canceled += instance.OnLandingGear;
+            @FreeLookToggle.started += instance.OnFreeLookToggle;
+            @FreeLookToggle.performed += instance.OnFreeLookToggle;
+            @FreeLookToggle.canceled += instance.OnFreeLookToggle;
+            @Zoom.started += instance.OnZoom;
+            @Zoom.performed += instance.OnZoom;
+            @Zoom.canceled += instance.OnZoom;
         }
 
         /// <summary>
@@ -324,6 +382,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @LandingGear.started -= instance.OnLandingGear;
             @LandingGear.performed -= instance.OnLandingGear;
             @LandingGear.canceled -= instance.OnLandingGear;
+            @FreeLookToggle.started -= instance.OnFreeLookToggle;
+            @FreeLookToggle.performed -= instance.OnFreeLookToggle;
+            @FreeLookToggle.canceled -= instance.OnFreeLookToggle;
+            @Zoom.started -= instance.OnZoom;
+            @Zoom.performed -= instance.OnZoom;
+            @Zoom.canceled -= instance.OnZoom;
         }
 
         /// <summary>
@@ -385,5 +449,19 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLandingGear(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FreeLookToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFreeLookToggle(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Zoom" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnZoom(InputAction.CallbackContext context);
     }
 }
