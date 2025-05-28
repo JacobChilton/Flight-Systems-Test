@@ -15,6 +15,15 @@ public class PlaneTest3 : MonoBehaviour
     public bool propDead = false;
     public bool gearUp = true;
 
+    private Vector2 mouseDelta;
+    public float mouseYawSensitivity = 0.1f; // Sensitivity multiplier
+    public float mousePitchSensitivity = 0.1f;
+
+    [Header("Propeller Settings")]
+    public float maxPropellerSpeed = 2000f; // Degrees per second
+    public float propellerSpinUpRate = 5f;  // Smooth spin-up
+    private float currentPropellerSpeed;
+
     [Header("UI Elements")]
     public TextMeshProUGUI speedText; // Assign TMP text in the inspector
 
@@ -22,11 +31,18 @@ public class PlaneTest3 : MonoBehaviour
     private float pitchInput;
     private float yawInput;
     private float rollInput;
-    private bool isGrounded;
+    [SerializeField] private bool isGrounded;
     private Rigidbody rb;
     private PlayerControls controls;
     private bool flapsDeployed = true;
     public float airspeed;
+    private bool isFreeLook = false;
+    [SerializeField] private RectTransform mouseIndicatorUI;
+    private Vector2 uiTargetPos;
+    private Vector2 smoothedMouseIndicatorPos;
+    public float mouseIndicatorSmoothSpeed = 5f;
+    [SerializeField] private CanvasGroup mouseIndicatorCanvasGroup;
+    public float fadeSpeed = 1f;
 
     [Header("GameObjects")]
     public GameObject flapsUp;
@@ -49,6 +65,8 @@ public class PlaneTest3 : MonoBehaviour
         rb.angularDamping = 0.5f;
         currentThrottleForce = 0.0f;
         LandingGear();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Awake()
@@ -59,23 +77,80 @@ public class PlaneTest3 : MonoBehaviour
         controls.Flight.LandingGear.performed += ctx => LandingGear();
         controls.Flight.FreeLookToggle.performed += ctx => ToggleFreeLook(true);
         controls.Flight.FreeLookToggle.canceled += ctx => ToggleFreeLook(false);
+        controls.Flight.MouseYaw.performed += ctx => mouseDelta = ctx.ReadValue<Vector2>();
+        controls.Flight.MouseYaw.canceled += ctx => mouseDelta = Vector2.zero;
     }
 
     void Update()
     {
         // Get user input
         throttleInput = Mathf.Clamp(Input.GetAxis("Throttle"), -1f, 1f);
-        pitchInput = Input.GetAxis("Vertical");
-        yawInput = Input.GetAxis("Horizontal");
+        //pitchInput = Input.GetAxis("Vertical");
+        //yawInput = Input.GetAxis("Horizontal");
         rollInput = Input.GetAxis("Roll");
-         
+
+        Vector2 clampedMouseDelta = new Vector2(Mathf.Clamp(mouseDelta.x, -20f, 20f), Mathf.Clamp(mouseDelta.y, -20f, 20f));
+
+        float fadeTarget = (clampedMouseDelta.magnitude > 0.1f && !isFreeLook) ? 1f : 0f;
+        mouseIndicatorCanvasGroup.alpha = Mathf.Lerp(mouseIndicatorCanvasGroup.alpha, fadeTarget, Time.deltaTime * fadeSpeed);
+
+        if (mouseIndicatorUI != null && !isFreeLook)
+        {
+            float maxVisualRange = 300f; // UI range on screen for visualized movement
+            Vector2 visualDelta = new Vector2(
+                Mathf.Clamp(mouseDelta.x * maxVisualRange / 20f, -maxVisualRange, maxVisualRange),
+                Mathf.Clamp(mouseDelta.y * maxVisualRange / 20f, -maxVisualRange, maxVisualRange)
+            );
+
+            // Center of screen + offset
+            uiTargetPos = Vector2.Lerp(uiTargetPos, visualDelta, Time.deltaTime * 10f);
+            smoothedMouseIndicatorPos = Vector2.Lerp(smoothedMouseIndicatorPos, visualDelta, Time.deltaTime * mouseIndicatorSmoothSpeed);
+            mouseIndicatorUI.anchoredPosition = smoothedMouseIndicatorPos;
+        }
+        else if (mouseIndicatorUI != null)
+        {
+            // Hide or reset in Free Look mode
+            mouseIndicatorUI.anchoredPosition = Vector2.zero;
+        }
+        if (!isFreeLook)
+        {
+            float keyboardPitch = Input.GetAxis("Vertical"); // Optional: Keep for keyboard support
+            float keyboardYaw = Input.GetAxis("Horizontal");
+            // Invert mouse Y for natural aircraft control (push down = nose down)
+
+            //pitchInput = keyboardPitch - mouseDelta.y * mousePitchSensitivity;
+            //yawInput = keyboardYaw + mouseDelta.x * mouseYawSensitivity;
+            pitchInput = keyboardPitch - clampedMouseDelta.y * mousePitchSensitivity;
+            yawInput = keyboardYaw + clampedMouseDelta.x * mouseYawSensitivity;
+        }
+        else
+        {
+            pitchInput = Input.GetAxis("Vertical"); // Optional: allow keyboard input during freelook
+            yawInput = Input.GetAxis("Horizontal");
+        }
+
         // Check if the plane is on the ground
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 2f); // Increased from 1f
 
         // Update UI Speed Display
         UpdateSpeedUI();
 
+        mouseDelta = Vector2.zero; // Clear delta each frame
+
         //Debug.Log($"Throttle: {throttleInput}, Roll: {rollInput}, Grounded: {isGrounded}");
+
+        // Calculate desired propeller speed
+        float targetSpeed = (currentThrottleForce / 100f) * maxPropellerSpeed;
+
+        // Smooth the spin-up/down of the propeller
+        currentPropellerSpeed = Mathf.Lerp(currentPropellerSpeed, targetSpeed, Time.deltaTime * propellerSpinUpRate);
+
+        // Rotate the propeller
+        if (prop != null && prop.activeSelf)
+        {
+            prop.transform.Rotate(Vector3.forward, currentPropellerSpeed * Time.deltaTime, Space.Self);
+        }
+
     }
 
     void FixedUpdate()
@@ -212,5 +287,16 @@ public class PlaneTest3 : MonoBehaviour
     {
         followCam.enabled = !enable;
         orbitCam.enabled = enable;
+        isFreeLook = enable;
+        if (enable)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 }

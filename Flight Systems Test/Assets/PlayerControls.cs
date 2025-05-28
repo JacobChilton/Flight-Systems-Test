@@ -135,6 +135,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MouseYaw"",
+                    ""type"": ""Value"",
+                    ""id"": ""b5f0040f-59d0-42ab-972d-ff341c9436f0"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -192,6 +201,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Zoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""499c1677-80e4-46f6-acd7-b32656b317e1"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseYaw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -205,6 +225,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Flight_LandingGear = m_Flight.FindAction("LandingGear", throwIfNotFound: true);
         m_Flight_FreeLookToggle = m_Flight.FindAction("FreeLookToggle", throwIfNotFound: true);
         m_Flight_Zoom = m_Flight.FindAction("Zoom", throwIfNotFound: true);
+        m_Flight_MouseYaw = m_Flight.FindAction("MouseYaw", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -290,6 +311,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Flight_LandingGear;
     private readonly InputAction m_Flight_FreeLookToggle;
     private readonly InputAction m_Flight_Zoom;
+    private readonly InputAction m_Flight_MouseYaw;
     /// <summary>
     /// Provides access to input actions defined in input action map "Flight".
     /// </summary>
@@ -321,6 +343,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Flight/Zoom".
         /// </summary>
         public InputAction @Zoom => m_Wrapper.m_Flight_Zoom;
+        /// <summary>
+        /// Provides access to the underlying input action "Flight/MouseYaw".
+        /// </summary>
+        public InputAction @MouseYaw => m_Wrapper.m_Flight_MouseYaw;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -362,6 +388,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Zoom.started += instance.OnZoom;
             @Zoom.performed += instance.OnZoom;
             @Zoom.canceled += instance.OnZoom;
+            @MouseYaw.started += instance.OnMouseYaw;
+            @MouseYaw.performed += instance.OnMouseYaw;
+            @MouseYaw.canceled += instance.OnMouseYaw;
         }
 
         /// <summary>
@@ -388,6 +417,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Zoom.started -= instance.OnZoom;
             @Zoom.performed -= instance.OnZoom;
             @Zoom.canceled -= instance.OnZoom;
+            @MouseYaw.started -= instance.OnMouseYaw;
+            @MouseYaw.performed -= instance.OnMouseYaw;
+            @MouseYaw.canceled -= instance.OnMouseYaw;
         }
 
         /// <summary>
@@ -463,5 +495,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoom(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseYaw" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseYaw(InputAction.CallbackContext context);
     }
 }
