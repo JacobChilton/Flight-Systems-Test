@@ -47,9 +47,18 @@ public class PlaneTest3 : MonoBehaviour
     [Header("GameObjects")]
     public GameObject flapsUp;
     public GameObject flapsDown;
-    public GameObject prop, LandGear;
+    public GameObject prop;
     [SerializeField] private Camera followCam;
     [SerializeField] private Camera orbitCam;
+
+    [Header("Landing Gear Transforms")]
+    public Transform[] landingGearParts; // All visual gear parts
+    public Transform[] landingGearTargetUp;
+    public Transform[] landingGearTargetDown;
+
+    public float gearMoveSpeed = 2f; // Higher = faster movement
+    private bool gearAnimating = false;
+    private bool movingGearUp = false;
     /*
      Controls:
      Throttle: W S
@@ -150,6 +159,48 @@ public class PlaneTest3 : MonoBehaviour
         {
             prop.transform.Rotate(Vector3.forward, currentPropellerSpeed * Time.deltaTime, Space.Self);
         }
+
+        if (gearAnimating && landingGearParts.Length > 0)
+        {
+            bool allLerped = true;
+
+            for (int i = 0; i < landingGearParts.Length; i++)
+            {
+                Transform part = landingGearParts[i];
+                Transform target = gearUp ? landingGearTargetUp[i] : landingGearTargetDown[i];
+
+                if (part == null || target == null) continue;
+
+                part.position = Vector3.Lerp(part.position, target.position, Time.deltaTime * gearMoveSpeed);
+                part.rotation = Quaternion.Lerp(part.rotation, target.rotation, Time.deltaTime * gearMoveSpeed);
+                part.localScale = Vector3.Lerp(part.localScale, target.localScale, Time.deltaTime * gearMoveSpeed); //  THIS LINE
+
+                if (Vector3.Distance(part.position, target.position) > 0.01f ||
+                    Quaternion.Angle(part.rotation, target.rotation) > 0.5f ||
+                    Vector3.Distance(part.localScale, target.localScale) > 0.01f)
+                {
+                    allLerped = false;
+                }
+            }
+
+            if (allLerped)
+            {
+                gearAnimating = false;
+
+                // Snap to final values for precision
+                for (int i = 0; i < landingGearParts.Length; i++)
+                {
+                    Transform part = landingGearParts[i];
+                    Transform target = gearUp ? landingGearTargetUp[i] : landingGearTargetDown[i];
+                    if (part == null || target == null) continue;
+
+                    part.position = target.position;
+                    part.rotation = target.rotation;
+                    part.localScale = target.localScale;
+                }
+            }
+        }
+
 
     }
 
@@ -264,19 +315,22 @@ public class PlaneTest3 : MonoBehaviour
 
     void LandingGear()
     {
+        //if (gearAnimating) return; // Prevent spamming while animating
+
+        //movingGearUp = !gearUp; // If gear is currently up, this will bring it down
+        gearAnimating = true;
+        
         if (gearUp) //toggles landing gear and adjusts top speed to simulate match drag
         {
-            LandGear.SetActive(true);
-            gearUp = false;
+            gearUp = !gearUp;
             if (!propDead)
             {
                 maxThrottleForce -= 100;
             }
         }
         else 
-        { 
-            LandGear.SetActive(false);
-            gearUp = true;
+        {
+            gearUp = !gearUp;
             if (!propDead)
             {
                 maxThrottleForce += 100;
