@@ -18,20 +18,86 @@ public class DayNightCycle : MonoBehaviour
     private float sunTargetIntensity = 50000f;
     private float moonTargetIntensity = 4.5f;
 
+    [Header("Time of Day")]
+    public int hour;
+    public int minute;
+    public string timeString;
+    private float timeOfDayInSeconds = 0f; // New timer variable
+    private float logicalSunAngle = 0f;
+
+
+
     void Start()
     {
         currentDayLength = baseDayLengthInSeconds;
-        isDay = transform.localEulerAngles.x < 180f;
+        //isDay = transform.localEulerAngles.x < 180f;
+        //sunLight.intensity = isDay ? sunTargetIntensity : 0f;
+        //moonLight.intensity = isDay ? 0f : moonTargetIntensity;
+
+
+        float angle = transform.localEulerAngles.x % 360f;
+        logicalSunAngle = angle;
+
+        // Initialize time from angle using same logic as Update
+        float daylightHours = 16f;
+        float nightHours = 8f;
+        float currentHour;
+
+        if (angle <= 180f)
+        {
+            currentHour = 4f + (angle / 180f) * daylightHours;
+        }
+        else
+        {
+            currentHour = 20f + ((angle - 180f) / 180f) * nightHours;
+        }
+
+        if (currentHour >= 24f) currentHour -= 24f;
+
+        timeOfDayInSeconds = currentHour * 3600f;
+
+        hour = Mathf.FloorToInt(currentHour);
+        minute = Mathf.FloorToInt((currentHour - hour) * 60f);
+        timeString = string.Format("{0:00}:{1:00}", hour, minute);
+
+        isDay = angle < 180f;
         sunLight.intensity = isDay ? sunTargetIntensity : 0f;
         moonLight.intensity = isDay ? 0f : moonTargetIntensity;
     }
 
     private void Update()
     {
-        float rotationSpeed = 360f / currentDayLength; // full rotation over a day
-        transform.Rotate(Vector3.right, rotationSpeed * Time.deltaTime);
+        // --- Track the rotation ---
+        float rotationSpeed = 360f / currentDayLength;
+        float step = rotationSpeed * Time.deltaTime;
 
-        float angle = transform.localEulerAngles.x;
+        transform.Rotate(Vector3.right, step);
+        logicalSunAngle = (logicalSunAngle + step) % 360f;
+
+        // --- Time from Angle ---
+        float daylightHours = 16f;
+        float nightHours = 8f;
+        float angle = logicalSunAngle % 360f;
+        float currentHour;
+
+        if (angle <= 180f)
+        {
+            // Day: from 0° (04:00) to 180° (20:00)
+            currentHour = 4f + (angle / 180f) * daylightHours;
+        }
+        else
+        {
+            // Night: from 180° (20:00) to 360° (04:00)
+            currentHour = 20f + ((angle - 180f) / 180f) * nightHours;
+        }
+
+        // Wrap around if over 24
+        if (currentHour >= 24f) currentHour -= 24f;
+
+        hour = Mathf.FloorToInt(currentHour);
+        minute = Mathf.FloorToInt((currentHour - hour) * 60f);
+        timeString = string.Format("{0:00}:{1:00}", hour, minute);
+        Debug.Log("Time: " + timeString);
 
         if (angle > 180 && isDay)
         {
@@ -67,6 +133,8 @@ public class DayNightCycle : MonoBehaviour
         {
             fadeLight(sunTargetIntensity, moonTargetIntensity);
         }
+
+
     }
     void fadeLight(float sunLightVal, float moonLightVal)
     {
