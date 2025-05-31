@@ -1,11 +1,14 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject[] raceCourses;
+    public GameObject[] raceCourses, canyonWalls, canyonWallsOff;
     public bool raceStarted = false;
     public TextMeshProUGUI timeText;
+    public GameObject canyonCollider1, canyonCollider2;
+    public int wallOn = 0;
     [Header("Time")]
     public string currentTime;
     [Space]
@@ -21,6 +24,26 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         raceCourses = GameObject.FindGameObjectsWithTag("RaceCourse");
+        canyonWalls = GameObject.FindGameObjectsWithTag("Canyon");
+
+        List<GameObject> deactivatedWalls = new List<GameObject>();
+
+        for (int i = 0; i < canyonWalls.Length; i++)
+        {
+            if (wallOn != 0)
+            {
+                canyonWalls[i].SetActive(false);
+                deactivatedWalls.Add(canyonWalls[i]);
+            }     
+            wallOn++;
+            if(wallOn == 4)
+            {
+                wallOn = 0;
+            }
+        }
+        canyonWallsOff = deactivatedWalls.ToArray();
+        canyonCollider1.SetActive(true);
+        canyonCollider2.SetActive(true);
     }
 
     // Update is called once per frame
