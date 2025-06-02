@@ -121,7 +121,7 @@ public class PlaneTest3 : MonoBehaviour
         else if (mouseIndicatorUI != null)
         {
             // Hide or reset in Free Look mode
-            mouseIndicatorUI.anchoredPosition = Vector2.zero;
+            mouseIndicatorUI.anchoredPosition = new Vector2(0, -229.5f);
         }
         if (!isFreeLook)
         {

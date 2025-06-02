@@ -144,6 +144,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ToggleSettings"",
+                    ""type"": ""Button"",
+                    ""id"": ""dfecac01-9385-4359-a378-e0820a86ff67"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -212,6 +221,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""MouseYaw"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9ade7917-2a50-47b9-858f-956c623df605"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleSettings"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -226,6 +246,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Flight_FreeLookToggle = m_Flight.FindAction("FreeLookToggle", throwIfNotFound: true);
         m_Flight_Zoom = m_Flight.FindAction("Zoom", throwIfNotFound: true);
         m_Flight_MouseYaw = m_Flight.FindAction("MouseYaw", throwIfNotFound: true);
+        m_Flight_ToggleSettings = m_Flight.FindAction("ToggleSettings", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -312,6 +333,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Flight_FreeLookToggle;
     private readonly InputAction m_Flight_Zoom;
     private readonly InputAction m_Flight_MouseYaw;
+    private readonly InputAction m_Flight_ToggleSettings;
     /// <summary>
     /// Provides access to input actions defined in input action map "Flight".
     /// </summary>
@@ -347,6 +369,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Flight/MouseYaw".
         /// </summary>
         public InputAction @MouseYaw => m_Wrapper.m_Flight_MouseYaw;
+        /// <summary>
+        /// Provides access to the underlying input action "Flight/ToggleSettings".
+        /// </summary>
+        public InputAction @ToggleSettings => m_Wrapper.m_Flight_ToggleSettings;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -391,6 +417,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @MouseYaw.started += instance.OnMouseYaw;
             @MouseYaw.performed += instance.OnMouseYaw;
             @MouseYaw.canceled += instance.OnMouseYaw;
+            @ToggleSettings.started += instance.OnToggleSettings;
+            @ToggleSettings.performed += instance.OnToggleSettings;
+            @ToggleSettings.canceled += instance.OnToggleSettings;
         }
 
         /// <summary>
@@ -420,6 +449,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @MouseYaw.started -= instance.OnMouseYaw;
             @MouseYaw.performed -= instance.OnMouseYaw;
             @MouseYaw.canceled -= instance.OnMouseYaw;
+            @ToggleSettings.started -= instance.OnToggleSettings;
+            @ToggleSettings.performed -= instance.OnToggleSettings;
+            @ToggleSettings.canceled -= instance.OnToggleSettings;
         }
 
         /// <summary>
@@ -502,5 +534,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseYaw(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleSettings" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleSettings(InputAction.CallbackContext context);
     }
 }

@@ -1,9 +1,11 @@
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class CustomizationController : MonoBehaviour
 {
-    public GameObject customizationUI; // UI for changing colours
+    public GameObject customizationUI, flightUI; // UI for changing colours
     public GameObject[] colorOptions, flightCameras, shopCameras; // Different plane color objects
+    public Transform propeller;
     
     private int currentIndex = 0;
     private bool isCustomizing = false;
@@ -35,6 +37,7 @@ public class CustomizationController : MonoBehaviour
         Cursor.visible = true;
         isCustomizing = true;
         customizationUI.SetActive(true);
+        flightUI.SetActive(false);
         //Time.timeScale = 0; // Optional: Pause game
     }
 
@@ -52,6 +55,8 @@ public class CustomizationController : MonoBehaviour
         {
             flightCameras[i].SetActive(true);
         }
+        flightUI.SetActive(true);
+        customizationUI.SetActive(false);
         PlayerPrefs.SetInt("SelectedPlane", currentIndex);
         PlayerPrefs.Save();
     }
@@ -80,11 +85,18 @@ public class CustomizationController : MonoBehaviour
         }
     }
 
-    void ChangeColor(int direction)
+    public void ChangeColor(int direction)
     {
         colorOptions[currentIndex].SetActive(false);
         currentIndex = (currentIndex + direction + colorOptions.Length) % colorOptions.Length;
         colorOptions[currentIndex].SetActive(true);
+        if (currentIndex == 3) {
+            propeller.localPosition = new Vector3(0.023023814f, 0.0651969835f, 1.55971265f);
+        }
+        else
+        {
+            propeller.localPosition = new Vector3(0.0229406059f, 0.0651957467f, 1.66531634f);
+        }
     }
     void CycleCamera(int direction)
     {

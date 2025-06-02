@@ -3,7 +3,7 @@ using UnityEngine;
 public class runwayScript : MonoBehaviour
 {
     private bool playerInZone = false;
-    public GameObject promptUI, flightUI; // Assign your UI element in the inspector
+    public GameObject promptUI; // Assign your UI element in the inspector
     public PlaneTest3 plane;
     public GameManager gameManager;
 
@@ -13,7 +13,6 @@ public class runwayScript : MonoBehaviour
         {
             playerInZone = true;
             promptUI.SetActive(true);
-            flightUI.SetActive(false);
         }
     }
 
@@ -23,7 +22,6 @@ public class runwayScript : MonoBehaviour
         {
             playerInZone = false;
             promptUI.SetActive(false);
-            flightUI.SetActive(true);
         }
     }
 

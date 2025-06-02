@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -7,8 +8,9 @@ public class GameManager : MonoBehaviour
     public GameObject[] raceCourses, canyonWalls, canyonWallsOff;
     public bool raceStarted = false;
     public TextMeshProUGUI timeText;
-    public GameObject canyonCollider1, canyonCollider2;
+    public GameObject canyonCollider1, canyonCollider2, settingsUI, settingsCamera;
     public int wallOn = 0;
+    public bool settingsEnabled = false;
     [Header("Time")]
     public string currentTime;
     [Space]
@@ -17,10 +19,17 @@ public class GameManager : MonoBehaviour
     public int seconds = 0;
     public bool realTime = false;
     public float clockSpeed = 1.0f;     // 1.0f = realtime, < 1.0f = slower, > 1.0f = faster - 30f = 2 min per hour
+    private PlayerControls controls;
+    public CustomizationController customization;
 
     //-- internal vars
     float msecs = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private void Awake()
+    {
+        controls = new PlayerControls();
+        controls.Flight.ToggleSettings.performed += ctx => ToggleSettings();
+    }
     void Start()
     {
         raceCourses = GameObject.FindGameObjectsWithTag("RaceCourse");
@@ -34,9 +43,9 @@ public class GameManager : MonoBehaviour
             {
                 canyonWalls[i].SetActive(false);
                 deactivatedWalls.Add(canyonWalls[i]);
-            }     
+            }
             wallOn++;
-            if(wallOn == 4)
+            if (wallOn == 4)
             {
                 wallOn = 0;
             }
@@ -45,6 +54,9 @@ public class GameManager : MonoBehaviour
         canyonCollider1.SetActive(true);
         canyonCollider2.SetActive(true);
     }
+
+    void OnEnable() { controls.Enable(); } //checks which input is pressed and directs to function
+    void OnDisable() { controls.Disable(); }
 
     // Update is called once per frame
     void Update()
@@ -113,5 +125,45 @@ public class GameManager : MonoBehaviour
             }
         }
         raceStarted = false;
+    }
+    public void ToggleSettings()
+    {
+        if (settingsEnabled)
+        {
+            for (int i = 0; i < customization.flightCameras.Length; i++)
+            {
+                customization.flightCameras[i].SetActive(true);
+            }
+            for (int i = 0; i < customization.shopCameras.Length; i++)
+            {
+                customization.shopCameras[i].SetActive(false);
+            }
+            customization.flightUI.SetActive(true);
+            Cursor.visible = false;
+            Time.timeScale = 1;
+            settingsUI.SetActive(false);
+            settingsEnabled = false;
+        }
+        else
+        {
+            for (int i = 0; i < customization.flightCameras.Length; i++)
+            {
+                customization.flightCameras[i].SetActive(false);
+            }
+            for (int i = 0; i < customization.shopCameras.Length; i++)
+            {
+                customization.shopCameras[i].SetActive(false);
+            }
+            customization.flightUI.SetActive(false);
+            settingsCamera.SetActive(true);
+            Cursor.visible = true;
+            Time.timeScale = 0;
+            settingsUI.SetActive(true);
+            settingsEnabled = true;
+        }
+    }
+    public void quitGame()
+    {
+        Application.Quit();
     }
 }
