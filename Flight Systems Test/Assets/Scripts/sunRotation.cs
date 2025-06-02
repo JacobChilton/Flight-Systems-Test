@@ -16,7 +16,7 @@ public class DayNightCycle : MonoBehaviour
     [Range(0, 1000)] public float moonTransitionSpeed = 0.2f;
 
     private float sunTargetIntensity = 50000f;
-    private float moonTargetIntensity = 4.5f;
+    private float moonTargetIntensity = 12.5f;
 
     [Header("Time of Day")]
     public int hour;
@@ -107,7 +107,7 @@ public class DayNightCycle : MonoBehaviour
             //moonLight.enabled = true;
             //sunLight.enabled = false;
             sunTargetIntensity = 100f;
-            moonTargetIntensity = 4.5f;
+            moonTargetIntensity = 12.5f;
             isTransitioning = true;
             moonLight.enabled = true;
             moonTransitionSpeed = 0.2f;

@@ -5,7 +5,8 @@ using TMPro; // Import TextMeshPro
 public class PlaneTest3 : MonoBehaviour
 {
     [Header("Flight Settings")]
-    public float maxThrottleForce = 5000f;
+    public float defaultMaxThrottle = 3500f;
+    public float maxThrottleForce = 3500f;
     public float currentThrottleForce;
     public float pitchSpeed = 50f;
     public float yawSpeed = 30f;
@@ -14,6 +15,7 @@ public class PlaneTest3 : MonoBehaviour
     public float airResistance = 0.99f;
     public bool propDead = false;
     public bool gearUp = true;
+    public bool controlsActive = true;
 
     private Vector2 mouseDelta;
     public float mouseYawSensitivity = 0.1f; // Sensitivity multiplier
@@ -203,24 +205,41 @@ public class PlaneTest3 : MonoBehaviour
 
         if (isGrounded && !groundThrottle && airspeed < 100f)
         {
-            maxThrottleForce -= 1700f;
+            maxThrottleForce -= 1200f;
             groundThrottle = !groundThrottle;
         }
         else if (!isGrounded && groundThrottle)
         {
             if (!propDead)
             {
-                maxThrottleForce += 1700f;
+                maxThrottleForce += 1200f;
             }
             groundThrottle = !groundThrottle;
         }
+        if (isGrounded && airspeed < 1f && mouseIndicatorCanvasGroup.alpha < 0.02f)
+        {
+            ToggleFreeLook(true);
+        }
+        else if (isGrounded && airspeed > 1)
+        {
+            ToggleFreeLook(false);
+        }
+
+        if (!controlsActive)
+        {
+            maxThrottleForce = 0f;
+        }
+
     }
 
     void FixedUpdate()
     {
         ApplyThrottle();
-        ApplyLift();
-        ApplyFlightControls();
+        if (controlsActive)
+        {         
+            ApplyLift();
+            ApplyFlightControls();
+        }
     }
 
     void ApplyThrottle()
@@ -261,7 +280,7 @@ public class PlaneTest3 : MonoBehaviour
         if (speedText != null)
         {
             airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
-            speedText.text = $"Speed: {airspeed:F1} km/h\nVelocity: {rb.linearVelocity}\nThrottle:{Mathf.Ceil(currentThrottleForce)/*Rounds to whole number*/}\nAltitude:{(Mathf.Round(transform.position.y * 100)) / 100.0/*Rounds to 2 DP*/}\nFlaps: {flapsDeployed}";
+            speedText.text = $"Speed: {airspeed:F1} km/h\nThrottle:{Mathf.Ceil(currentThrottleForce)/*Rounds to whole number*/}\nAltitude:{(Mathf.Round(transform.position.y * 100)) / 100.0/*Rounds to 2 DP*/}\nFlaps: {flapsDeployed}";
         }
     }
 
@@ -300,13 +319,13 @@ public class PlaneTest3 : MonoBehaviour
     }
     void Respawn()
     {
-        maxThrottleForce = 3500; //resets throttle
+        maxThrottleForce = defaultMaxThrottle; //resets throttle
         if (groundThrottle)
         {
-            maxThrottleForce -= 1700;
+            maxThrottleForce -= 1200;
         }
         Debug.Log("Respawned");
-        transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z); //raises plane by 20 on the Y axis
+        transform.position = new Vector3(transform.position.x, transform.position.y + 10, transform.position.z); //raises plane by 20 on the Y axis
         transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0); //redjusts plane angle
         prop.SetActive(true); //respawns propeller
         Debug.Log("prop back - respawned");
@@ -319,6 +338,7 @@ public class PlaneTest3 : MonoBehaviour
         {
             maxThrottleForce -= 100;
         }
+        ToggleFreeLook(false);
     }
     public void deadProp() //destroys propeller and resets throttle to 0
     {
@@ -360,8 +380,8 @@ public class PlaneTest3 : MonoBehaviour
         isFreeLook = enable;
         if (enable)
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         else
         {
