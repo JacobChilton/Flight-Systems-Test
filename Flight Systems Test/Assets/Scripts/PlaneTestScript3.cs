@@ -31,7 +31,7 @@ public class PlaneTest3 : MonoBehaviour
     private float pitchInput;
     private float yawInput;
     private float rollInput;
-    [SerializeField] private bool isGrounded;
+    [SerializeField] private bool isGrounded, groundThrottle;
     private Rigidbody rb;
     private PlayerControls controls;
     private bool flapsDeployed = true;
@@ -105,7 +105,7 @@ public class PlaneTest3 : MonoBehaviour
 
         if (mouseIndicatorUI != null && !isFreeLook)
         {
-            float maxVisualRange = 300f; // UI range on screen for visualized movement
+            float maxVisualRange = 350f; // UI range on screen for visualized movement
             Vector2 visualDelta = new Vector2(
                 Mathf.Clamp(mouseDelta.x * maxVisualRange / 20f, -maxVisualRange, maxVisualRange),
                 Mathf.Clamp(mouseDelta.y * maxVisualRange / 20f, -maxVisualRange, maxVisualRange)
@@ -201,7 +201,19 @@ public class PlaneTest3 : MonoBehaviour
             }
         }
 
-
+        if (isGrounded && !groundThrottle && airspeed < 100f)
+        {
+            maxThrottleForce -= 1700f;
+            groundThrottle = !groundThrottle;
+        }
+        else if (!isGrounded && groundThrottle)
+        {
+            if (!propDead)
+            {
+                maxThrottleForce += 1700f;
+            }
+            groundThrottle = !groundThrottle;
+        }
     }
 
     void FixedUpdate()
@@ -288,13 +300,17 @@ public class PlaneTest3 : MonoBehaviour
     }
     void Respawn()
     {
+        maxThrottleForce = 3500; //resets throttle
+        if (groundThrottle)
+        {
+            maxThrottleForce -= 1700;
+        }
         Debug.Log("Respawned");
         transform.position = new Vector3(transform.position.x, transform.position.y + 20, transform.position.z); //raises plane by 20 on the Y axis
         transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0); //redjusts plane angle
         prop.SetActive(true); //respawns propeller
         Debug.Log("prop back - respawned");
         propDead = false;
-        maxThrottleForce = 3500; //resets throttle
         if (flapsDeployed) //adjusts throttle based on flaps and landing gear
         {
             maxThrottleForce -= 500;

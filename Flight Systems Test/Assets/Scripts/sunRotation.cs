@@ -97,7 +97,7 @@ public class DayNightCycle : MonoBehaviour
         hour = Mathf.FloorToInt(currentHour);
         minute = Mathf.FloorToInt((currentHour - hour) * 60f);
         timeString = string.Format("{0:00}:{1:00}", hour, minute);
-        Debug.Log("Time: " + timeString);
+        //Debug.Log("Time: " + timeString);
 
         if (angle > 180 && isDay)
         {

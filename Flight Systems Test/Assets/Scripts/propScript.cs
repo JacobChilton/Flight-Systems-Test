@@ -17,7 +17,7 @@ public class propScript : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.GetComponent<Terrain>())
+        if (other.gameObject.GetComponent<Terrain>() || other.CompareTag("Canyon"))
         {
             Debug.Log("collision");
             planeTest3.deadProp();
