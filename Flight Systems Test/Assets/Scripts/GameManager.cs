@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.ShaderGraph;
+//using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -146,6 +146,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            customization.ExitCustomization();
             for (int i = 0; i < customization.flightCameras.Length; i++)
             {
                 customization.flightCameras[i].SetActive(false);

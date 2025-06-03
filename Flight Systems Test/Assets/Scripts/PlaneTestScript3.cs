@@ -25,6 +25,7 @@ public class PlaneTest3 : MonoBehaviour
     public float maxPropellerSpeed = 2000f; // Degrees per second
     public float propellerSpinUpRate = 5f;  // Smooth spin-up
     private float currentPropellerSpeed;
+    public AudioSource audioSource;
 
     [Header("UI Elements")]
     public TextMeshProUGUI speedText; // Assign TMP text in the inspector
@@ -107,7 +108,7 @@ public class PlaneTest3 : MonoBehaviour
 
         if (mouseIndicatorUI != null && !isFreeLook)
         {
-            float maxVisualRange = 350f; // UI range on screen for visualized movement
+            float maxVisualRange = 500f; // UI range on screen for visualized movement
             Vector2 visualDelta = new Vector2(
                 Mathf.Clamp(mouseDelta.x * maxVisualRange / 20f, -maxVisualRange, maxVisualRange),
                 Mathf.Clamp(mouseDelta.y * maxVisualRange / 20f, -maxVisualRange, maxVisualRange)
@@ -281,6 +282,24 @@ public class PlaneTest3 : MonoBehaviour
         {
             airspeed = rb.linearVelocity.magnitude * 3.6f; // Convert from m/s to km/h
             speedText.text = $"Speed: {airspeed:F1} km/h\nThrottle:{Mathf.Ceil(currentThrottleForce)/*Rounds to whole number*/}\nAltitude:{(Mathf.Round(transform.position.y * 100)) / 100.0/*Rounds to 2 DP*/}\nFlaps: {flapsDeployed}";
+            float throttlePercent = currentThrottleForce / 100f;
+
+            // Volume: 0 when throttle is 0, up to ~0.8 max
+            audioSource.volume = Mathf.Lerp(0f, 0.1f, throttlePercent);
+
+            // Pitch: base 1.0, increase slightly (up to ~1.2)
+            audioSource.pitch = Mathf.Lerp(0.5f, 1.1f, throttlePercent);
+
+            // Optional: Stop audio if throttle is 0 to save resources
+            if (currentThrottleForce <= 0.01f)
+            {
+                if (audioSource.isPlaying) audioSource.Stop();
+            }
+            else
+            {
+                if (!audioSource.isPlaying) audioSource.Play();
+            }
+
         }
     }
 
