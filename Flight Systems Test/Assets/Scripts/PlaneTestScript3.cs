@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 using TMPro; // Import TextMeshPro
 
 public class PlaneTest3 : MonoBehaviour
@@ -62,6 +63,14 @@ public class PlaneTest3 : MonoBehaviour
     public float gearMoveSpeed = 2f; // Higher = faster movement
     private bool gearAnimating = false;
     private bool movingGearUp = false;
+
+    [Header("Mission Objectives")]
+    public List<Objective> objectives;
+    private int currentObjectiveIndex = 0;
+
+    [Header("UI")]
+    public TextMeshProUGUI currentObjectiveText;
+    public TextMeshProUGUI objectiveText;
     /*
      Controls:
      Throttle: W S
@@ -79,6 +88,14 @@ public class PlaneTest3 : MonoBehaviour
         LandingGear();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        UpdateObjectiveUI();
+        foreach (Objective obj in objectives)
+        {
+            if (obj == null) continue;
+
+            Debug.Log("Objective: " + obj.objectiveName);
+        }
+
     }
 
     private void Awake()
@@ -408,4 +425,44 @@ public class PlaneTest3 : MonoBehaviour
             Cursor.visible = false;
         }
     }
+    void UpdateObjectiveUI()
+    {
+        if (objectiveText == null || objectives.Count == 0) return;
+
+        string display = "<b>Mission Objectives:</b>\n";
+        string display2 = "<b>Current Objective:</b>\n";
+        for (int i = 0; i < objectives.Count; i++)
+        {
+            if (i == currentObjectiveIndex)
+                display2 += $"<color=yellow>? {objectives[i].objectiveName}</color>\n";
+            else if (objectives[i].isCompleted)
+                display += $"<color=green>? {objectives[i].objectiveName}</color>\n";
+            else
+                display += $"• {objectives[i].objectiveName}\n";
+        }
+        currentObjectiveText.text = display2;
+        objectiveText.text = display;
+    }
+    public void CheckObjectiveCompletion(string reachedOutpost)
+    {
+        if (currentObjectiveIndex >= objectives.Count) return;
+
+        Objective current = objectives[currentObjectiveIndex];
+        if (current.targetLocation.name == reachedOutpost && !current.isCompleted)
+        {
+            current.isCompleted = true;
+            currentObjectiveIndex++;
+
+            Debug.Log($"Objective '{current.objectiveName}' completed!");
+            UpdateObjectiveUI();
+        }
+    }
+
+}
+[System.Serializable]
+public class Objective
+{
+    public string objectiveName; // e.g., "Deliver to Outpost Bravo"
+    public Transform targetLocation; // Location to reach (e.g., runway collider or marker)
+    public bool isCompleted = false;
 }

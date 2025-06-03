@@ -1,6 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-//using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -8,34 +8,44 @@ public class GameManager : MonoBehaviour
     public GameObject[] raceCourses, canyonWalls, canyonWallsOff;
     public bool raceStarted = false;
     public TextMeshProUGUI timeText;
-    public GameObject canyonCollider1, canyonCollider2, settingsUI, settingsCamera;
-    public int wallOn = 0;
+    public GameObject canyonCollider1, canyonCollider2, settingsUI, settingsCamera, raceUI, missionUI;
+
+    [Header("Settings UI")]
     public bool settingsEnabled = false;
-    [Header("Time")]
-    public string currentTime;
-    [Space]
-    public int minutes = 0;
-    public int hour = 0;
-    public int seconds = 0;
-    public bool realTime = false;
-    public float clockSpeed = 1.0f;     // 1.0f = realtime, < 1.0f = slower, > 1.0f = faster - 30f = 2 min per hour
-    private PlayerControls controls;
     public CustomizationController customization;
 
-    //-- internal vars
-    float msecs = 0;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Awake()
+    [Header("Clock")]
+    public string currentTime;
+    public int minutes = 0, hour = 0, seconds = 0;
+    public bool realTime = false;
+    public float clockSpeed = 1.0f;
+
+    [Header("Race Times Display")]
+    public TextMeshProUGUI countDownTimesText;
+    public TextMeshProUGUI countUpTimesText;
+
+    private float msecs = 0f;
+    private PlayerControls controls;
+
+    private Dictionary<string, float> countdownTimes = new Dictionary<string, float>();
+    private Dictionary<string, float> countupTimes = new Dictionary<string, float>();
+
+    void Awake()
     {
         controls = new PlayerControls();
         controls.Flight.ToggleSettings.performed += ctx => ToggleSettings();
     }
+
+    void OnEnable() => controls.Enable();
+    void OnDisable() => controls.Disable();
+
     void Start()
     {
         raceCourses = GameObject.FindGameObjectsWithTag("RaceCourse");
         canyonWalls = GameObject.FindGameObjectsWithTag("Canyon");
 
         List<GameObject> deactivatedWalls = new List<GameObject>();
+        int wallOn = 0;
 
         for (int i = 0; i < canyonWalls.Length; i++)
         {
@@ -44,125 +54,187 @@ public class GameManager : MonoBehaviour
                 canyonWalls[i].SetActive(false);
                 deactivatedWalls.Add(canyonWalls[i]);
             }
-            wallOn++;
-            if (wallOn == 4)
-            {
-                wallOn = 0;
-            }
+            wallOn = (wallOn + 1) % 4;
         }
+
         canyonWallsOff = deactivatedWalls.ToArray();
         canyonCollider1.SetActive(true);
         canyonCollider2.SetActive(true);
     }
 
-    void OnEnable() { controls.Enable(); } //checks which input is pressed and directs to function
-    void OnDisable() { controls.Disable(); }
-
-    // Update is called once per frame
     void Update()
     {
-        if(raceStarted){
-                msecs += Time.deltaTime * clockSpeed; //calculate time and stores in variable
-            if (msecs >= 1.0f)
-            {
-                msecs -= 1.0f;
-                seconds++;
+        if (!raceStarted) return;
 
-                if (seconds >= 60)
+        msecs += Time.deltaTime * clockSpeed;
+        if (msecs >= 1.0f)
+        {
+            msecs -= 1.0f;
+            seconds++;
+            if (seconds >= 60)
+            {
+                seconds = 0;
+                minutes++;
+                if (minutes >= 60)
                 {
-                    seconds = 0;
-                    minutes++;
-                    //Debug.Log(string.Format("{0:D2} - {1:D2} - {2:D2}", hour, minutes, seconds)); //updates log every game-speed minute
-                    if (minutes >= 60)
-                    {
-                        minutes = 0;
-                        hour++;
-                        if (hour >= 24)
-                            hour = 0;
-                    }
+                    minutes = 0;
+                    hour = (hour + 1) % 24;
                 }
             }
-            int displayMilliseconds = (int)(msecs * 1000);
-            currentTime = string.Format("{0:D2}:{1:D2}:{2:D2}:{3:D2}", hour, minutes, seconds, displayMilliseconds);
+        }
+
+        int displayMilliseconds = (int)(msecs * 1000);
+        currentTime = string.Format("{0:D2}:{1:D2}:{2:D2}:{3:D2}", hour, minutes, seconds, displayMilliseconds);
+        if (timeText != null)
+        {
             timeText.text = currentTime;
-}
+        }
     }
+
     public void disableOtherRaces(GameObject activeRaceCourse)
     {
-        //for (int i = 0; i < raceCourses.Length; i++)
-        //{
-        //    if (raceCourses[i] == null)
-        //    {
-        //        raceCourses[i].SetActive(false);
-        //    }
-        //}
-
         foreach (GameObject raceCourse in raceCourses)
         {
-            if (raceCourse != activeRaceCourse) // Disable all except the active one
+            if (raceCourse != activeRaceCourse)
             {
                 raceCourse.SetActive(false);
             }
         }
-        currentTime = "0";
         raceStarted = true;
+        ResetGameClock();
+        missionUI.SetActive(false);
+        raceUI.SetActive(true);
     }
+
     public void enableOtherRaces(GameObject activeRaceCourse)
     {
-        //for (int i = 0; i < raceCourses.Length; i++)
-        //{
-        //    if (raceCourses[i] == null)
-        //    {
-        //        raceCourses[i].SetActive(false);
-        //    }
-        //}
-
         foreach (GameObject raceCourse in raceCourses)
         {
-            if (raceCourse != activeRaceCourse) // Disable all except the active one
+            if (raceCourse != activeRaceCourse)
             {
                 raceCourse.SetActive(true);
             }
         }
         raceStarted = false;
+        StartCoroutine(ReenableStartObjectAfterDelay(15f));
     }
+
+    void ResetGameClock()
+    {
+        hour = 0;
+        minutes = 0;
+        seconds = 0;
+        msecs = 0;
+    }
+
     public void ToggleSettings()
     {
         if (settingsEnabled)
         {
-            for (int i = 0; i < customization.flightCameras.Length; i++)
-            {
-                customization.flightCameras[i].SetActive(true);
-            }
-            for (int i = 0; i < customization.shopCameras.Length; i++)
-            {
-                customization.shopCameras[i].SetActive(false);
-            }
+            foreach (GameObject cam in customization.flightCameras)
+                cam.SetActive(true);
+            foreach (GameObject cam in customization.shopCameras)
+                cam.SetActive(false);
+
             customization.flightUI.SetActive(true);
             Cursor.visible = false;
             Time.timeScale = 1;
             settingsUI.SetActive(false);
-            settingsEnabled = false;
         }
         else
         {
             customization.ExitCustomization();
-            for (int i = 0; i < customization.flightCameras.Length; i++)
-            {
-                customization.flightCameras[i].SetActive(false);
-            }
-            for (int i = 0; i < customization.shopCameras.Length; i++)
-            {
-                customization.shopCameras[i].SetActive(false);
-            }
+
+            foreach (GameObject cam in customization.flightCameras)
+                cam.SetActive(false);
+            foreach (GameObject cam in customization.shopCameras)
+                cam.SetActive(false);
+
             customization.flightUI.SetActive(false);
             settingsCamera.SetActive(true);
             Cursor.visible = true;
             Time.timeScale = 0;
             settingsUI.SetActive(true);
-            settingsEnabled = true;
+        }
+
+        settingsEnabled = !settingsEnabled;
+    }
+
+    public void UpdateCourseTime(RaceCourse course)
+    {
+        string courseName = course.name;
+
+        if (course.countDirection)
+        {
+            countdownTimes[courseName] = course.finalTime;
+        }
+        else
+        {
+            countupTimes[courseName] = course.finalTime;
+        }
+
+        SaveBestTime(courseName, course.finalTime, course.countDirection);
+        UpdateTimeDisplays();
+    }
+
+    void UpdateTimeDisplays()
+    {
+        countDownTimesText.text = "Countdown Courses:\n";
+        foreach (var kvp in countdownTimes)
+        {
+            float best = LoadBestTime(kvp.Key, true);
+            string bestDisplay = best >= 0f ? $"{best:F2}s" : "No record";
+            countDownTimesText.text += $"{kvp.Key}:\nYour Best: {bestDisplay}\nTime: {kvp.Value:F2}s\n\n";
+        }
+
+        countUpTimesText.text = "Count-Up Courses:\n";
+        foreach (var kvp in countupTimes)
+        {
+            float best = LoadBestTime(kvp.Key, false);
+            string bestDisplay = best >= 0f ? $"{best:F2}s" : "No record";
+            countUpTimesText.text += $"{kvp.Key}:\nYour Best: {bestDisplay}\nTime: {kvp.Value:F2}s\n\n";
         }
     }
+
+
+    public void SaveBestTime(string courseName, float newTime, bool countDown)
+    {
+        string key = countDown ? $"BestLeft_{courseName}" : $"BestUp_{courseName}";
+
+        if (PlayerPrefs.HasKey(key))
+        {
+            float savedTime = PlayerPrefs.GetFloat(key);
+
+            if ((countDown && newTime > savedTime) || (!countDown && newTime < savedTime))
+            {
+                PlayerPrefs.SetFloat(key, newTime);
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetFloat(key, newTime);
+        }
+
+        PlayerPrefs.Save();
+    }
+
+    public float LoadBestTime(string courseName, bool countDown)
+    {
+        string key = countDown ? $"BestLeft_{courseName}" : $"BestUp_{courseName}";
+        return PlayerPrefs.HasKey(key) ? PlayerPrefs.GetFloat(key) : -1f;
+    }
+
+    private IEnumerator ReenableStartObjectAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (missionUI != null)
+        {
+            missionUI.SetActive(true);
+            raceUI.SetActive(false);
+        }
+    }
+
     public void quitGame()
     {
         Application.Quit();

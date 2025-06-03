@@ -5,14 +5,21 @@ public class RaceCourse : MonoBehaviour
 {
     public GameManager gameManager;
     public GameObject[] CheckPoints;
-    [SerializeField]private int currentCheckpointIndex = 0;
+    [SerializeField] private int currentCheckpointIndex = 0;
+
+    public bool countDirection; // true = countdown, false = count up
+    public float timeLimit;
+    private float currentTime;
+    private bool timerRunning = false;
+
+    public float finalTime = 0f;
 
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         List<GameObject> checkpointsList = new List<GameObject>();
 
-        foreach (Transform child in transform) //Find all child objects with the "CheckPoints" tag
+        foreach (Transform child in transform)
         {
             if (child.CompareTag("CheckPoints"))
             {
@@ -20,23 +27,47 @@ public class RaceCourse : MonoBehaviour
             }
         }
 
-        CheckPoints = checkpointsList.ToArray(); //Converts list to array
+        CheckPoints = checkpointsList.ToArray();
 
-        for (int i = 0; i < CheckPoints.Length; i++) //Disable all checkpoints except the first one
+        for (int i = 0; i < CheckPoints.Length; i++)
         {
             CheckPoints[i].SetActive(i == 0);
         }
+
+        currentCheckpointIndex = 0;
     }
 
-    // Function called by checkpoint scripts when a player reaches a checkpoint
+    void Update()
+    {
+        if (!timerRunning) return;
+
+        if (countDirection)
+        {
+            currentTime -= Time.deltaTime;
+            if (currentTime <= 0f)
+            {
+                currentTime = 0f;
+                timerRunning = false;
+                Debug.Log("Race Failed: Time's up!");
+                ResetCourse();
+            }
+        }
+        else
+        {
+            currentTime += Time.deltaTime;
+        }
+
+        finalTime = currentTime;
+    }
+
     public void OnCheckpointReached(GameObject checkpoint)
-    { 
-        if (CheckPoints.Length == 0 || checkpoint != CheckPoints[currentCheckpointIndex]) return; //Check if the checkpoint is the correct one in sequence(ensures no skipping)
+    {
+        if (CheckPoints.Length == 0 || checkpoint != CheckPoints[currentCheckpointIndex]) return;
 
-        CheckPoints[currentCheckpointIndex].SetActive(false); //Disable the current checkpoint and move to next
-        currentCheckpointIndex++; 
+        CheckPoints[currentCheckpointIndex].SetActive(false);
+        currentCheckpointIndex++;
 
-        if (currentCheckpointIndex < CheckPoints.Length)//Enable the next checkpoint if it exists
+        if (currentCheckpointIndex < CheckPoints.Length)
         {
             CheckPoints[currentCheckpointIndex].SetActive(true);
             if (currentCheckpointIndex < CheckPoints.Length - 1)
@@ -46,14 +77,35 @@ public class RaceCourse : MonoBehaviour
         }
         else
         {
-            Debug.Log("Race Finished");
-            currentCheckpointIndex = 0;
-            CheckPoints[currentCheckpointIndex].SetActive(true);
-            gameManager.enableOtherRaces(gameObject);
+            timerRunning = false;
+
+            string msg = countDirection
+                ? $"Finished Countdown with {finalTime:F2} seconds left"
+                : $"Finished Count-Up in {finalTime:F2} seconds";
+            Debug.Log(msg);
+
+            gameManager.UpdateCourseTime(this);
+            ResetCourse();
         }
-        if (currentCheckpointIndex == 1) //Disables the other courses if one is started
+
+        // If this is the start of the race (first checkpoint reached), start timer
+        if (currentCheckpointIndex == 1)
         {
+            currentTime = countDirection ? timeLimit : 0f;
+            finalTime = currentTime;
+            timerRunning = true;
             gameManager.disableOtherRaces(gameObject);
         }
+    }
+
+    void ResetCourse()
+    {
+        currentCheckpointIndex = 0;
+        for (int i = 0; i < CheckPoints.Length; i++)
+        {
+            CheckPoints[i].SetActive(i == 0);
+        }
+
+        gameManager.enableOtherRaces(gameObject);
     }
 }

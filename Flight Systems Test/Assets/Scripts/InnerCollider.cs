@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class innerCollider : MonoBehaviour
 {
-    public GameObject outsideObject;        //Object to deactivate - Canyon
+    public GameObject outsideObject, sun;        //Object to deactivate - Canyon
     public Collider outerCollider;          //The outer collider to enable
     public Collider thisCollider;           //Optional: if not using 'GetComponent'
 
@@ -22,7 +22,10 @@ public class innerCollider : MonoBehaviour
         {
             // Deactivate the outside object
             if (outsideObject != null)
+            {
                 outsideObject.SetActive(false);
+                sun.SetActive(false);
+            }
 
             // Disable this (inner) collider
             thisCollider.enabled = false;

@@ -6,13 +6,19 @@ public class runwayScript : MonoBehaviour
     public GameObject promptUI; // Assign your UI element in the inspector
     public PlaneTest3 plane;
     public GameManager gameManager;
+    public string outpostID;
+    public bool isHome;
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            playerInZone = true;
-            promptUI.SetActive(true);
+            if (isHome)
+            {
+                playerInZone = true;
+                promptUI.SetActive(true);
+            }
+            plane.CheckObjectiveCompletion(outpostID);
         }
     }
 
@@ -21,7 +27,10 @@ public class runwayScript : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInZone = false;
-            promptUI.SetActive(false);
+            if (isHome)
+            {  
+                promptUI.SetActive(false);
+            }
         }
     }
 
