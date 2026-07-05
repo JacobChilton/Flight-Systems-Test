@@ -46,7 +46,7 @@ public class PlaneTest3 : MonoBehaviour
     private Vector2 smoothedMouseIndicatorPos;
     public float mouseIndicatorSmoothSpeed = 5f;
     [SerializeField] private CanvasGroup mouseIndicatorCanvasGroup;
-    public float fadeSpeed = 1f;
+    public float fadeSpeed = 0.4f;
 
     [Header("GameObjects")]
     public GameObject flapsUp;
