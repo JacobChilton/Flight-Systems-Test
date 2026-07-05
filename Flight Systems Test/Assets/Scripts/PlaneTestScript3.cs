@@ -11,8 +11,8 @@ public class PlaneTest3 : MonoBehaviour
     public float currentThrottleForce;
     public float pitchSpeed = 50f;
     public float yawSpeed = 30f;
-    public float rollSpeed = 80f;
-    public float liftForce = 500f; // Increased for stronger effect
+    public float rollSpeed = 100f;
+    public float liftForce = 40f; // Increased for stronger effect
     public float airResistance = 0.99f;
     public bool propDead = false;
     public bool gearUp = true;
@@ -76,6 +76,9 @@ public class PlaneTest3 : MonoBehaviour
      Throttle: W S
      Pitch: Q E
      Roll: A D
+     Flaps: F
+     Landing Gear: G
+     Respawn: R
     */
 
     void Start() 
